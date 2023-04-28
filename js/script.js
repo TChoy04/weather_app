@@ -4,6 +4,7 @@ let temperature = document.getElementById("temperature");
 let weatherImage = document.getElementById("weatherIcon");
 let currentLocation = "New York";
 let input = document.getElementsByTagName("input")[0];
+let searchInput = document.getElementById("search-input");
 let searchButton = document.getElementById("search-button");
 const nthNumber = (number) => {
   if (number > 3 && number < 21) return "th";
@@ -72,7 +73,9 @@ const getCurrentWeather = async () => {
       `https://api.weatherapi.com/v1/current.json?key=5a7ea79ebf2d40c789290611232003&q=${currentLocation}&aqi=no`
     );
     res = await res.json();
-    cityName.innerText = `${res.location.name}, ${res.location.region}`;
+    if (res.location.region != "")
+      cityName.innerText = `${res.location.name}, ${res.location.region}`;
+    else cityName.innerText = `${res.location.name}`;
     condition.innerText = res.current.condition.text;
     temperature.innerText = Math.round(res.current.feelslike_f) + " °F";
     weatherImage.setAttribute("src", res.current.condition.icon);
@@ -87,17 +90,30 @@ searchButton.addEventListener("click", async () => {
   currentLocation = await fetch(
     `https://api.weatherapi.com/v1/search.json?key=5a7ea79ebf2d40c789290611232003&q=${input.value}&aqi=no`
   );
+  try {
+    currentLocation = await currentLocation.json();
 
-  currentLocation = await currentLocation.json();
-
-  if (currentLocation != null) {
     currentLocation = currentLocation[0].name;
     getCurrentWeather();
+  } catch {
+    searchInput.value = "";
+    searchInput.placeholder = "City not found!";
   }
 });
 
-searchBox.addEventListener("keydown", (e) => {
+searchInput.addEventListener("keydown", async (e) => {
+  console.log(e);
   if (e.key === "Enter") {
-    getWeatherData(units);
+    currentLocation = await fetch(
+      `https://api.weatherapi.com/v1/search.json?key=5a7ea79ebf2d40c789290611232003&q=${input.value}&aqi=no`
+    );
+    try {
+      currentLocation = await currentLocation.json();
+      currentLocation = currentLocation[0].name;
+      getCurrentWeather();
+    } catch {
+      searchInput.value = "";
+      searchInput.placeholder = "City not found!";
+    }
   }
 });

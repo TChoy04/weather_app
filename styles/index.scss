@@ -21,6 +21,10 @@ body {
 }
 .container {
   padding: 7rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
 }
 #currentCondition {
   font-size: 3rem;
@@ -80,4 +84,8 @@ body {
   background-size: contain;
   background-repeat: no-repeat;
   cursor: pointer;
+}
+#forecast {
+  display: flex;
+  justify-content: space-between;
 }

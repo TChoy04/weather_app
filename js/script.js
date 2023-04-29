@@ -73,6 +73,25 @@ const getCurrentWeather = async () => {
       `https://api.weatherapi.com/v1/current.json?key=5a7ea79ebf2d40c789290611232003&q=${currentLocation}&aqi=no`
     );
     res = await res.json();
+    forecastRes = await fetch(
+      `https://api.weatherapi.com/v1/forecast.json?key=5a7ea79ebf2d40c789290611232003&q=${currentLocation}&aqi=no`
+    );
+    forecastRes = await forecastRes.json();
+    hour = Math.floor(new Date().getHours());
+    forecast = document.getElementById("forecast");
+    forecast.innerHTML = "";
+    for (let x = hour; x < hour + 8; x++) {
+      let val = x;
+      if (x >= 24) val %= 24;
+      temp = forecastRes.forecast.forecastday[0].hour[val];
+
+      newDiv = `<div class="forecastBlock">
+        <h1>${temp.time.split(" ")[1]}</h1>
+        <h1>${temp.temp_f} °F</h1>
+        <img src=${temp.condition.icon}></img>
+      </div>`;
+      forecast.innerHTML += newDiv;
+    }
     if (res.location.region != "")
       cityName.innerText = `${res.location.name}, ${res.location.region}`;
     else cityName.innerText = `${res.location.name}`;
@@ -86,7 +105,6 @@ const getCurrentWeather = async () => {
 getCurrentWeather();
 updateClock();
 searchButton.addEventListener("click", async () => {
-  console.log(input);
   currentLocation = await fetch(
     `https://api.weatherapi.com/v1/search.json?key=5a7ea79ebf2d40c789290611232003&q=${input.value}&aqi=no`
   );
@@ -102,7 +120,6 @@ searchButton.addEventListener("click", async () => {
 });
 
 searchInput.addEventListener("keydown", async (e) => {
-  console.log(e);
   if (e.key === "Enter") {
     currentLocation = await fetch(
       `https://api.weatherapi.com/v1/search.json?key=5a7ea79ebf2d40c789290611232003&q=${input.value}&aqi=no`
